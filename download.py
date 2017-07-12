@@ -11,11 +11,12 @@ def download():
     curlen = os.listdir(path)
     sleep_time = 3
     dl_x, dl_y = 833L, 182L
+    quit_x, quit_y = 1508L, 8L
     chrome_x, chrome_y = 116L, 839L
 
     with open("copybook_sfa_bdcloudAndCode.txt", "r") as cpfile:
         pages = cpfile.readlines()
-        for i in range(len(pages)):
+        for i in range(2, len(pages)):
             info = pages[i].split('\t')
             page, code = info[0], info[1]
 
@@ -45,5 +46,7 @@ def download():
                     time.sleep(1)
                     suffix = os.listdir(path)[-1][-10:]
                 print "Download completed!!!"
+            m.click(quit_x, quit_y)
+            curlen = len(os.listdir(path))
 
 download()
