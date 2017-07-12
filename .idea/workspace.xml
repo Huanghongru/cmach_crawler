@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46f5cf78-d3e9-43d9-a5ac-2fb59772aeb2" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/cpbooks_sfa/convolutional-kanji-master.zip" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/download.py" afterPath="$PROJECT_DIR$/download.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/failed_page.txt" afterPath="$PROJECT_DIR$/failed_page.txt" />
-    </list>
+    <list default="true" id="46f5cf78-d3e9-43d9-a5ac-2fb59772aeb2" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -100,7 +95,7 @@
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
     <property name="SearchEverywhereHistoryKey" value="python&#9;ACTION&#9;ActivatePythonConsoleToolWindow" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/pyleetcode" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
