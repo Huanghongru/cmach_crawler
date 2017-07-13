@@ -23,5 +23,7 @@ def retriveImg(url):
             print "Download image complete!!    Total: {0}".format(i+1)
         except Exception as e:
             print e
+
+
 retriveImg(url)
 

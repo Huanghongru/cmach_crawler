@@ -24,7 +24,7 @@ def download():
 
     with open("copybook_sfa_bdcloudAndCode.txt", "r") as cpfile:
         pages = cpfile.readlines()
-        for i in range(115, len(pages)):
+        for i in range(150, len(pages)):
             info = pages[i].split('\t')
             page, code = info[0], info[1]
 
