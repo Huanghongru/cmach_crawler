@@ -89,10 +89,19 @@ def tag():
 
 
 def filt_redline():
+    with open("void_list.txt", "r") as vl:
+        blank_images = vl.readline().split('\t')
+
     des_path = os.path.join(os.getcwd(), "ztw")
     images = os.listdir(path)
     for img_name in images:
         try:
+            if img_name in blank_images:
+                print "{0} is a void image".format(img_name)
+                continue
+            if os.path.exists(os.path.join(des_path, img_name)):
+                print "{0} already exists".format(img_name)
+                continue
             img = cv2.imread(os.path.join(path, img_name))
             filted_img = filter_withMSE(img)
             cv2.imwrite(os.path.join(des_path, img_name), filted_img)
@@ -101,6 +110,7 @@ def filt_redline():
             print e
 
 filt_redline()
+
 # cv2.namedWindow('origin')
 # cv2.imshow('origin', img)
 # cv2.namedWindow('after1')
