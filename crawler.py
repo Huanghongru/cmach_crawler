@@ -41,7 +41,7 @@ def retriveImg_zitiweb(url):
 
     with open("hanzi.txt", "r") as hf:
         lines = hf.readlines()
-        for i in range(len(lines)):
+        for i in range(1041, len(lines)):
             try:
                 char_code = "%".join(['']+lines[i].split()[2:5])
                 req = urllib2.Request(url, "text="+char_code)
@@ -52,6 +52,7 @@ def retriveImg_zitiweb(url):
                 for j in range(1, len(images) - 1):
                     img_name = path + "\\{0}.png".format(i*8+j)
                     if os.path.exists(img_name):
+                        print "Image already exists!"
                         continue
                     img_url = urlparse.urljoin(real_url, images[j].get('src'))
                     urllib.urlretrieve(img_url, img_name)
@@ -62,6 +63,9 @@ def retriveImg_zitiweb(url):
 if __name__ == '__main__':
     url = "http://www.zitiweb.com/mj.php"
     retriveImg_zitiweb(url)
+
+
+# crawl to 1038th character
 
 
 
