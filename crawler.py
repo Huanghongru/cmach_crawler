@@ -1,16 +1,13 @@
 # coding=utf-8
 import os
-import re
-import time
-import codecs
 import urllib
-import chardet
 import urllib2
 import urlparse
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 
-def retriveImg_sinablog(url):
+def retrieveImg_sinablog(url):
     """
     This function crawl a sina blog full of handwritten masterpiece by Yingzhang Tian
     :param url: the sina blog url: http://blog.sina.com.cn/s/blog_70e8ec2b0102vjlq.html
@@ -30,7 +27,7 @@ def retriveImg_sinablog(url):
         except Exception as e:
             print e
 
-def retriveImg_zitiweb(char_list, stored_file_name):
+def retrieveImg_zitiweb(char_list, stored_file_name):
     """
     This function crawl a shufa generation web
     :param url: http://www.zitiweb.com/mj.php
@@ -58,8 +55,80 @@ def retriveImg_zitiweb(char_list, stored_file_name):
         except Exception as e:
             print e
 
+
+def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib):
+    """
+    This function crawl a calligraphy generation web
+    :param calligrapher:        an str specifies the calligrapher, the calligrapher-value pair are as follows:
+                        楷书：{‘柳公权毛笔书法字体’：185，   ’颜真卿楷书毛笔书法字体‘：196，  ’欧体楷书毛笔字体‘：187}
+                        行书：{’王羲之毛笔行书书法字体‘：181， ’八大山人毛笔字体‘：183， ’米芾行书毛笔字体‘：188}
+    :param type:                a string specifies the calligraphy type, must be one of the following:
+                                [kaishu, caoshu, xingshu, xingkai, lishu, weibei]
+    :param stored_file_name:    file where retrieved images were stored
+    :param attrib:              a list of the attribution of the retrieved img [size, width, height]
+    :return:
+    """
+    if not os.path.exists(stored_dir_name):
+        os.mkdir(stored_dir_name)
+
+    # get all utf code
+    utf = []
+    with open("tag.txt", "r") as tf:
+        for line in tf.readlines():
+            utf.append(line.split()[0])
+
+    # set character attribution
+    url = "http://www.52maobizi.com/"+type
+    driver = webdriver.Chrome()
+    driver.get(url)
+
+    select = Select(driver.find_element_by_id('FontInfoId'))
+    select.select_by_value(calligrapher)
+
+    font_size = driver.find_element_by_name("FontSize")
+    font_size.clear()
+    font_size.send_keys(attrib[0])
+
+    img_w = driver.find_element_by_name("ImageWidth")
+    img_w.clear()
+    img_w.send_keys(attrib[1])
+
+    img_h = driver.find_element_by_name("ImageHeight")
+    img_h.clear()
+    img_h.send_keys(attrib[2])
+
+    # retrieve image for corresponding utf-8
+    for i in range(0, len(utf)):
+        char_dir = os.path.join(stored_dir_name, str(i))
+        if not os.path.exists(char_dir):
+            os.mkdir(char_dir)
+
+        try:
+            char = driver.find_element_by_name("Content")
+            char.clear()
+            char.send_keys(eval("u'\u{0}'".format(utf[i])))
+
+            driver.find_element_by_id("btnOnline").click()
+            content = driver.page_source
+
+            soup = BeautifulSoup(content, "lxml")
+            img_src = soup.findAll("img", {"id": "imgResult"})[0].get('src')
+
+            # stored_img_name = str(len(os.listdir(char_dir)))+'.png'
+            stored_img_name = '1.png'
+            if not os.path.exists(os.path.join(char_dir, stored_img_name)):
+                urllib.urlretrieve(img_src, os.path.join(char_dir, stored_img_name))
+                print "{0}. retrieve {1}".format(i, stored_img_name)
+            else:
+                print "image {0} already exists.".format(stored_img_name)
+        except Exception as e:
+            print e
+
+
 if __name__ == '__main__':
-    
+    calligraphers = ['185', '196', '187']
+    type = 'kaishu'
+    stored_file_name = "standard"
+    attrib = ['75', '128', '128']
+    retrieveImg_52maobizi(calligraphers[1], type, stored_file_name, attrib)
 
-
-# name begins from 712
