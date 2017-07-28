@@ -32,12 +32,13 @@ def filter_withMSE(img):
     return subimg
 
 
-def filter_withoutMSE(img):
+def filter_withoutMSE(img_name, path):
     """
     Filter without MSE, mainly to determine whether it is a blank picture
-    :param img:
+    :param img_name
     :return:
     """
+    img = cv2.imread(os.path.join(path, img_name))
     subimg = img.copy()
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
@@ -46,8 +47,8 @@ def filter_withoutMSE(img):
     return subimg
 
 
-def is_blank(img):
-    return (void_img == filter_withoutMSE(img)).all()
+def is_blank(img, path):
+    return (void_img == filter_withoutMSE(img, path)).all()
 
 
 def get_voidImg_list():
@@ -81,24 +82,19 @@ def tag():
                         print "{0}.png is a void image".format(i*8+j)
                         continue
                     else:
-                        tf.write("{0}.png\t".format(i*8+j))
+                        tf.write("{0}.png\t".format(i*8+j+1))
                         print "Adding {0}.png to tag:{1}".format(i*8+j, Tag)
                 tf.write('\n')
         except Exception as e:
             print e
 
 
-def filt_redline():
-    with open("void_list.txt", "r") as vl:
-        blank_images = vl.readline().split('\t')
-
-    des_path = os.path.join(os.getcwd(), "ztw")
+def filt_redline(origin_file_name, filterd_file_name):
+    des_path = os.path.join(os.getcwd(), filterd_file_name)
+    path = os.path.join(os.getcwd(), origin_file_name)
     images = os.listdir(path)
     for img_name in images:
         try:
-            if img_name in blank_images:
-                print "{0} is a void image".format(img_name)
-                continue
             if os.path.exists(os.path.join(des_path, img_name)):
                 print "{0} already exists".format(img_name)
                 continue
@@ -109,15 +105,74 @@ def filt_redline():
         except Exception as e:
             print e
 
-filt_redline()
+def filter_white(file_name):
+    """
+    Task assigned by Master Yi, and further filtering is needed
+    :return:
+    """
+    def white_rate(img_name, lpath):
+        img = cv2.imread(os.path.join(lpath, img_name))
+        sum = 0
+        s = 40468500.0
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                sum += img[i, j].sum()
+        return sum/s
 
-# cv2.namedWindow('origin')
-# cv2.imshow('origin', img)
-# cv2.namedWindow('after1')
-# cv2.imshow('after1', filter_withMSE(img))
-# cv2.namedWindow('after2')
-# cv2.imshow('after2', filter_withoutMSE(img))
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+    lpath = os.path.join(os.getcwd(), file_name)
+    white_th = 0.9995
+    for img in os.listdir(lpath):
+        if white_rate(img, lpath) > white_th:
+            os.remove(os.path.join(lpath, img))
+            print "{0} is a white image!!".format(img)
+        else:
+            print "{0} is a valid image!!".format(img)
+
+
+def label():
+    utf = []
+    with open("tag.txt", "r") as tf:
+        for line in tf.readlines():
+            utf.append(line.split()[0])
+
+    lpath = os.path.join(os.getcwd(), "ztw")
+    with open("label.txt", "a") as lf:
+        for img_name in os.listdir(lpath):
+            lf.write(utf[(int(img_name[:-4])-1)/8]+' ')
+
+
+def copyImg(img, sourceDir, targetDir):
+    with open(os.path.join(sourceDir, img), "rb") as oif:
+        with open(os.path.join(targetDir, img), "wb") as nf:
+            nf.write(oif.read())
+
+def getCaligrapher(num, targetDir):
+    if not os.path.exists(targetDir):
+        os.mkdir(targetDir)
+
+    with open("tag.txt", "r") as tf:
+        for line in tf.readlines():
+            if not os.path.exists(os.path.join(targetDir, "label.txt")):
+                f = open("label.txt", "w")
+                f.close()
+            with open(os.path.join(targetDir, 'label.txt'), "a") as lf:
+                lf.write(line.split()[0] + ' ')
+
+    spath = os.path.join(os.getcwd(), "ztw")
+    tpath = os.path.join(os.getcwd(), targetDir)
+    for img in os.listdir(spath):
+        if (int(img[:-4])-1)%8 == num:
+            copyImg(img, spath, tpath)
+            print "copy {} ".format(img)
+
+if __name__ == '__main__':
+    # spath = os.path.join(os.getcwd(), "ztw")
+    # tpath = os.path.join(os.getcwd(), "wxz")
+    # with open(os.path.join(spath, "1.png"), "rb") as sf:
+    #     with open(os.path.join(tpath, "1.png"), "wb") as tf:
+    #         tf.write(sf.read())
+    getCaligrapher(7, "shzsjt")
+
+
 
 

@@ -1,4 +1,4 @@
-# ! coding: utf-8
+# coding=utf-8
 import os
 import re
 import time
@@ -30,42 +30,36 @@ def retriveImg_sinablog(url):
         except Exception as e:
             print e
 
-def retriveImg_zitiweb(url):
+def retriveImg_zitiweb(char_list, stored_file_name):
     """
     This function crawl a shufa generation web
     :param url: http://www.zitiweb.com/mj.php
     :return: retrieved images were stored in /zitiweb
     """
+    url = "http://www.zitiweb.com/mj.php"
     real_url = "http://www.zitiweb.com"
-    path = os.path.join(os.getcwd(), "zitiweb")
+    path = os.path.join(os.getcwd(), stored_file_name)
 
-    with open("hanzi.txt", "r") as hf:
-        lines = hf.readlines()
-        for i in range(1041, len(lines)):
-            try:
-                char_code = "%".join(['']+lines[i].split()[2:5])
-                req = urllib2.Request(url, "text="+char_code)
-                response = urllib2.urlopen(req)
-                content = response.read()
-                soup = BeautifulSoup(content, "lxml")
-                images = soup.findAll('img')
-                for j in range(1, len(images) - 1):
-                    img_name = path + "\\{0}.png".format(i*8+j)
-                    if os.path.exists(img_name):
-                        print "Image already exists!"
-                        continue
-                    img_url = urlparse.urljoin(real_url, images[j].get('src'))
-                    urllib.urlretrieve(img_url, img_name)
-                    print "Retrieved character {0} with mode {1}".format(i, i*8+j)
-            except Exception as e:
-                print e
+    for i in range(len(char_list)):
+        try:
+            req = urllib2.Request(url, "text="+char_list[i])
+            response = urllib2.urlopen(req)
+            content = response.read()
+            soup = BeautifulSoup(content, "lxml")
+            images = soup.findAll('img')
+            for j in range(1, len(images) - 1):
+                img_name = path + "\\{0}.png".format(i*8+j)
+                if os.path.exists(img_name):
+                    print "Image already exists!"
+                    continue
+                img_url = urlparse.urljoin(real_url, images[j].get('src'))
+                urllib.urlretrieve(img_url, img_name)
+                print "Retrieved character {0} with mode {1}".format(i, i*8+j)
+        except Exception as e:
+            print e
 
 if __name__ == '__main__':
-    url = "http://www.zitiweb.com/mj.php"
-    retriveImg_zitiweb(url)
+    
 
 
-# crawl to 1038th character
-
-
-
+# name begins from 712
