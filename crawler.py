@@ -56,16 +56,22 @@ def retrieveImg_zitiweb(char_list, stored_file_name):
             print e
 
 
-def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib):
+def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib, img_name, maxNum=2000):
     """
     This function crawl a calligraphy generation web
     :param calligrapher:        an str specifies the calligrapher, the calligrapher-value pair are as follows:
-                        楷书：{‘柳公权毛笔书法字体’：185，   ’颜真卿楷书毛笔书法字体‘：196，  ’欧体楷书毛笔字体‘：187}
-                        行书：{’王羲之毛笔行书书法字体‘：181， ’八大山人毛笔字体‘：183， ’米芾行书毛笔字体‘：188}
+                        楷书：{‘柳公权毛笔书法字体’：    185，   ’颜真卿楷书毛笔书法字体‘：196，  ’欧体楷书毛笔字体‘：  187}
+                        行书：{’王羲之毛笔行书书法字体‘：181，    ’八大山人毛笔字体‘：     183， ’米芾行书毛笔字体‘：   188,
+                              '李旭科':               184,    '叶根友':              220,   '郑板桥':           251,
+                              '向佳红':               218,    '金梅':                210,   '蔡云汉':           214,
+                              '段宁':                 229,    '良怀':               233,    '孙中山':          234,
+                              '舒同':                 235,    '赵孟頫':              186,    '钟齐':           213}
     :param type:                a string specifies the calligraphy type, must be one of the following:
                                 [kaishu, caoshu, xingshu, xingkai, lishu, weibei]
     :param stored_file_name:    file where retrieved images were stored
     :param attrib:              a list of the attribution of the retrieved img [size, width, height]
+    :param img_name:            a str specifies the stored_image name
+    :param maxNum:              an int specifies the max crawled num of images
     :return:
     """
     if not os.path.exists(stored_dir_name):
@@ -98,7 +104,7 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib):
     img_h.send_keys(attrib[2])
 
     # retrieve image for corresponding utf-8
-    for i in range(0, len(utf)):
+    for i in range(0, maxNum):
         char_dir = os.path.join(stored_dir_name, str(i))
         if not os.path.exists(char_dir):
             os.mkdir(char_dir)
@@ -114,21 +120,30 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib):
             soup = BeautifulSoup(content, "lxml")
             img_src = soup.findAll("img", {"id": "imgResult"})[0].get('src')
 
-            # stored_img_name = str(len(os.listdir(char_dir)))+'.png'
-            stored_img_name = '1.png'
+            stored_img_name = img_name+'.png'
             if not os.path.exists(os.path.join(char_dir, stored_img_name)):
                 urllib.urlretrieve(img_src, os.path.join(char_dir, stored_img_name))
                 print "{0}. retrieve {1}".format(i, stored_img_name)
             else:
-                print "image {0} already exists.".format(stored_img_name)
+                print "{0}. image {1} already exists.".format(i, stored_img_name)
         except Exception as e:
             print e
 
 
 if __name__ == '__main__':
-    calligraphers = ['185', '196', '187']
-    type = 'kaishu'
-    stored_file_name = "standard"
-    attrib = ['75', '128', '128']
-    retrieveImg_52maobizi(calligraphers[1], type, stored_file_name, attrib)
+    # calligraphers = ['185', '196', '187']
+    # type = 'kaishu'
+    # stored_file_name = "standard"
+    # attrib = ['75', '128', '128']
+    # retrieveImg_52maobizi(calligraphers[2], type, stored_file_name, attrib, '2')
 
+    art_clp = ['181', '183', '188', '184', '220',
+               '251', '218', '210', '214', '229',
+               '233', '234', '235']
+    type = "xingshu"
+    stored_file_name = "art"
+    attrib = ['75', '128', '128']
+    for i in range(7, len(art_clp)):
+        retrieveImg_52maobizi(art_clp[i], type, stored_file_name, attrib, str(i))
+
+# stop at 8.png 1000, continue 1001
