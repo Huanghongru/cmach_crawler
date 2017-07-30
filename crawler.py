@@ -3,6 +3,8 @@ import os
 import urllib
 import urllib2
 import urlparse
+
+import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
@@ -86,6 +88,7 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib, img_name,
     # set character attribution
     url = "http://www.52maobizi.com/"+type
     driver = webdriver.Chrome()
+    driver.set_page_load_timeout(30)
     driver.get(url)
 
     select = Select(driver.find_element_by_id('FontInfoId'))
@@ -104,7 +107,8 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib, img_name,
     img_h.send_keys(attrib[2])
 
     # retrieve image for corresponding utf-8
-    for i in range(0, maxNum):
+    start = 1259 if img_name == '10' else 0
+    for i in range(start, maxNum):
         char_dir = os.path.join(stored_dir_name, str(i))
         if not os.path.exists(char_dir):
             os.mkdir(char_dir)
@@ -114,12 +118,16 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib, img_name,
             char.clear()
             char.send_keys(eval("u'\u{0}'".format(utf[i])))
 
-            driver.find_element_by_id("btnOnline").click()
+            for j in range(2):
+                driver.find_element_by_id("btnOnline").click()
+                time.sleep(0.5)
+
             content = driver.page_source
+            print "content get..",
 
             soup = BeautifulSoup(content, "lxml")
             img_src = soup.findAll("img", {"id": "imgResult"})[0].get('src')
-
+            print "src get",
             stored_img_name = img_name+'.png'
             if not os.path.exists(os.path.join(char_dir, stored_img_name)):
                 urllib.urlretrieve(img_src, os.path.join(char_dir, stored_img_name))
@@ -128,6 +136,7 @@ def retrieveImg_52maobizi(calligrapher, type, stored_dir_name, attrib, img_name,
                 print "{0}. image {1} already exists.".format(i, stored_img_name)
         except Exception as e:
             print e
+    driver.close()
 
 
 if __name__ == '__main__':
@@ -143,7 +152,7 @@ if __name__ == '__main__':
     type = "xingshu"
     stored_file_name = "art"
     attrib = ['75', '128', '128']
-    for i in range(7, len(art_clp)):
+    for i in range(10, len(art_clp)):
         retrieveImg_52maobizi(art_clp[i], type, stored_file_name, attrib, str(i))
 
 # stop at 8.png 1000, continue 1001
